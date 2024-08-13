@@ -17,8 +17,6 @@ if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
     return;
 }
 
-// Just in case...
-try{
 
 
     // Define the function to update the next payment date for active subscriptions
@@ -137,18 +135,3 @@ try{
         }
 
     }
-
-}catch( Exception $ex ){
-    
-    wc_get_logger()->debug(
-        sprintf(
-            'Error: %s',
-            $ex->getMessage()
-        ),
-        array(
-            'source'    => 'fatal-errors',
-            'data'      => '',
-            'backtrace' => false,
-        )
-    );
-}
