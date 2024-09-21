@@ -35,6 +35,9 @@ wp-config.php
 # htaccess
 /.htaccess
 
+# PHPStorm
+.idea
+
 # All plugins
 #
 # Note: If you wish to whitelist plugins,
