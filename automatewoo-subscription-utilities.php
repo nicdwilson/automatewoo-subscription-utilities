@@ -4,196 +4,86 @@
  * Description: A collection of utilities for AutomateWoo and WooCommerce Subscriptions.
  * Version: 1.0.0
  * Author: @nicw, WooCommerce Growth Team
+ * Text Domain: automatewoo-subscription-utilities
+ * Domain Path: /languages
+ * Requires at least: 5.0
+ * Tested up to: 6.4
+ * Requires PHP: 7.4
+ * WC requires at least: 5.0
+ * WC tested up to: 8.0
  */
 
-
-// Ensure this is not accessed directly
+// Prevent direct access
 if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+	exit;
 }
 
-// Is Woo Subscriptions active?
-if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
-	return;
+// Define plugin constants
+define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_VERSION', '1.0.0' );
+define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_FILE', __FILE__ );
+define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+
+// Load Composer autoloader
+if ( file_exists( AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_DIR . 'vendor/autoload.php' ) ) {
+	require_once AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_DIR . 'vendor/autoload.php';
 }
 
-
-// Define the function to update the next payment date for active subscriptions
-function reset_next_payment_one_hour( $workflow ) {
-
-	try {
-
-		// Get the subscription from the workflow
-		$subscription = $workflow->data_layer()->get_subscription();
-
-
-		wc_get_logger()->debug(
-			sprintf(
-				'Running schedule reset on subscription ID: %s',
-				$subscription->get_id()
-			),
-			array(
-				'source'    => 'automatewoo-reset-subscription-timings',
-				'data'      => '',
-				'backtrace' => false,
-			)
-		);
-
-		// Get the current next payment date
-		$next_payment = $subscription->get_date( 'next_payment' );
-
-		if ( $next_payment ) {
-			// Convert the next payment date to a timestamp
-			$next_payment_timestamp = strtotime( 'now' );
-
-			// Add 2 minutes to the timestamp
-			$new_next_payment_timestamp = $next_payment_timestamp + 62 * MINUTE_IN_SECONDS;
-
-			// Convert the new timestamp back to a MySQL datetime format
-			$new_next_payment_date = date( 'Y-m-d H:i:s', $new_next_payment_timestamp );
-
-			// Update the subscription with the new next payment date
-			$subscription->update_dates( array( 'next_payment' => $new_next_payment_date ) );
-
-			// Save the subscription
-			$subscription->save();
-		}
-
-	} catch ( Exception $ex ) {
-
-		wc_get_logger()->debug(
-			sprintf(
-				'Error: %s',
-				$ex->getMessage()
-			),
-			array(
-				'source'    => 'automatewoo-reset-subscription-timings-errors',
-				'data'      => '',
-				'backtrace' => false,
-			)
-		);
+// Declare WooCommerce Features API compatibility
+add_action( 'before_woocommerce_init', function() {
+	if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'product_block_editor', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'product_editor', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'hpos', __FILE__, true );
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 	}
-}
+} );
 
-// Define the function to update the next payment date for active subscriptions
-function add_three_minutes_to_next_payment( $workflow ) {
-
-	try {
-
-		// Get the subscription from the workflow
-		$subscription = $workflow->data_layer()->get_subscription();
-
-
-		wc_get_logger()->debug(
-			sprintf(
-				'Adding three minutes to subscription ID: %s',
-				$subscription->get_id()
-			),
-			array(
-				'source'    => 'automatewoo-reset-subscription-timings',
-				'data'      => '',
-				'backtrace' => false,
-			)
-		);
-
-		// Get the current next payment date
-		$next_payment = $subscription->get_date( 'next_payment' );
-
-		if ( $next_payment ) {
-			// Convert the next payment date to a timestamp
-			$next_payment_timestamp = strtotime( $next_payment );
-
-			// Add 2 minutes to the timestamp
-			$new_next_payment_timestamp = $next_payment_timestamp + 3 * MINUTE_IN_SECONDS;
-
-			// Convert the new timestamp back to a MySQL datetime format
-			$new_next_payment_date = date( 'Y-m-d H:i:s', $new_next_payment_timestamp );
-
-			// Update the subscription with the new next payment date
-			$subscription->update_dates( array( 'next_payment' => $new_next_payment_date ) );
-
-			// Save the subscription
-			$subscription->save();
-		}
-
-	} catch ( Exception $ex ) {
-
-		wc_get_logger()->debug(
-			sprintf(
-				'Error: %s',
-				$ex->getMessage()
-			),
-			array(
-				'source'    => 'automatewoo-reset-subscription-timings-errors',
-				'data'      => '',
-				'backtrace' => false,
-			)
-		);
+// Initialize the plugin
+add_action( 'plugins_loaded', function() {
+	// Check if WooCommerce is active
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		add_action( 'admin_notices', function() {
+			echo '<div class="notice notice-error"><p>' . 
+				 esc_html__( 'AutomateWoo Subscription Utilities requires WooCommerce to be installed and activated.', 'automatewoo-subscription-utilities' ) . 
+				 '</p></div>';
+		} );
+		return;
 	}
-}
 
-//Still needs to be fit into a workflow.
-// Currently, trigger this by targeting a single subscription with a mnaul flow
-// It checks if a scheduled action exists for a subscription, and will write an audit
-// report to two separate logs, one for success, one for fails.
-
-function do_subscription_audit( $workflow ) {
-
-	try {
-
-		// Get the subscription from the workflow
-		$subscription    = $workflow->data_layer()->get_subscription();
-		$subscription_id = $subscription->get_id();
-
-		$next_payment_scheduled = as_next_scheduled_action( 'woocommerce_scheduled_subscription_payment', [ 'subscription_id' => $subscription_id ] );
-		$expiration_scheduled   = as_next_scheduled_action( 'woocommerce_scheduled_subscription_expiration', [ 'subscription_id' => $subscription_id ] );
-
-		if ( ! $next_payment_scheduled && ! $expiration_scheduled ) {
-
-			wc_get_logger()->debug(
-
-			/**
-			 * Write an edit link in here and life will get a lot easier
-			 */
-				sprintf(
-					'Subscription ID %s is missing a scheduled payment',
-					$subscription_id
-				),
-				array(
-					'source'    => 'automatewoo-audit-failure',
-					'data'      => '',
-					'backtrace' => false,
-				)
-			);
-		} else {
-
-			wc_get_logger()->debug(
-			/**
-			 * Write an edit link in here and life will get a lot easier
-			 */
-				sprintf(
-					'Subscription ID %s is has a scheduled payment',
-					$subscription_id
-				),
-				array(
-					'source'    => 'automatewoo-audit-success',
-					'data'      => '',
-					'backtrace' => false,
-				)
-			);
-		}
-	} catch ( Exception $ex ) {
-
-		wc_get_logger()->debug(
-			sprintf(
-				'Error: %s',
-				$ex->getMessage()
-			),
-			array(
-				'source'    => 'automatewoo-subscription-audit-errors',
-				'data'      => '',
-				'backtrace' => false,
-			)
-		);
+	// Check if WooCommerce Subscriptions is active
+	if ( ! function_exists( 'wcs_get_subscriptions' ) ) {
+		add_action( 'admin_notices', function() {
+			echo '<div class="notice notice-error"><p>' . 
+				 esc_html__( 'AutomateWoo Subscription Utilities requires WooCommerce Subscriptions to be installed and activated.', 'automatewoo-subscription-utilities' ) . 
+				 '</p></div>';
+		} );
+		return;
 	}
-}
+
+	// Check if AutomateWoo is active
+	if ( ! class_exists( 'AutomateWoo' ) ) {
+		add_action( 'admin_notices', function() {
+			echo '<div class="notice notice-error"><p>' . 
+				 esc_html__( 'AutomateWoo Subscription Utilities requires AutomateWoo to be installed and activated.', 'automatewoo-subscription-utilities' ) . 
+				 '</p></div>';
+		} );
+		return;
+	}
+
+	// Initialize the main plugin class
+	\AutomateWooSubscriptionUtilities\Plugin::init();
+} );
+
+// Activation hook
+register_activation_hook( __FILE__, function() {
+	// Create necessary database tables or options if needed
+	\AutomateWooSubscriptionUtilities\Plugin::activate();
+} );
+
+// Deactivation hook
+register_deactivation_hook( __FILE__, function() {
+	// Cleanup if needed
+	\AutomateWooSubscriptionUtilities\Plugin::deactivate();
+} );

@@ -1,0 +1,60 @@
+/* Subscription Audit Admin Styles */
+
+.overdue-subscriptions .count {
+    background: #d63638;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 11px;
+    margin-left: 5px;
+}
+
+.days-overdue {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.days-overdue.warning {
+    background: #f0b849;
+    color: #000;
+}
+
+.days-overdue.critical {
+    background: #d63638;
+    color: white;
+}
+
+.audit-tools .card {
+    background: white;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.audit-tools .card h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.audit-tools .card ul {
+    margin: 0;
+}
+
+.audit-tools .card li {
+    margin-bottom: 8px;
+}
+
+.remove-overdue {
+    margin-left: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 782px) {
+    .remove-overdue {
+        margin-left: 0;
+        margin-top: 5px;
+        display: block;
+    }
+} 
