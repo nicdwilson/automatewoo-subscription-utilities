@@ -28,10 +28,6 @@
             "includes/actions/class-reset-scheduled-action.php",
             "includes/actions/class-remove-end-date.php",
             "includes/actions/class-subscription-audit.php",
-            "includes/actions/class-perform-subscription-audit.php",
-            "includes/triggers/class-daily-subscription-audit.php",
-            "includes/triggers/class-comprehensive-subscription-audit.php",
-            "includes/admin/class-admin-page.php",
             "includes/utilities/class-subscription-actions.php",
             "includes/utilities/class-subscription-audit.php"
         ]
