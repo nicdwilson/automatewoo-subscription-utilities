@@ -32,15 +32,19 @@ Once the plugin is activated, you'll find three new actions in your AutomateWoo 
 
 1. **Reset Scheduled Action - Add 3 Minutes**
    - Resets the scheduled payment action by adding 3 minutes to the existing renewal time
-   - Useful for testing or emergency rescheduling
+   - Why? Resetting the payment date recreates the stored Scheduled Action in Action Scheduler
+   - Recommended usage: use this as a manual workflow to ensure all subscriptions have Scheduled Actions
 
 2. **Remove End Date**
    - Removes the end date from a subscription to make it ongoing
    - Useful for extending subscriptions indefinitely
+   - Recommended usage: run as a manual workflow
 
 3. **Audit Subscription Scheduled Actions**
    - Checks if a subscription has scheduled payment and expiration actions
    - Logs results to WooCommerce logs with admin edit links
+   - Recommended usage: Run as a manual workflow
+   - Recommended usage: target only active subscriptions (these are the only subscriptions expected to have scheduled payment actions)
 
 ### Programmatic Usage
 
