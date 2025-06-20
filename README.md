@@ -10,6 +10,9 @@ This plugin extends AutomateWoo with additional actions for managing WooCommerce
 - **Remove End Date**: Remove the end date from a subscription to make it ongoing
 - **Audit Subscription Scheduled Actions**: Check if a subscription has scheduled payment and expiration actions
 
+![Annotation on 2025-06-20 at 17-18-59](https://github.com/user-attachments/assets/ca9d23a5-7b40-40ce-b4f9-f402989f5327)
+
+
 ## Requirements
 
 - WordPress 5.0 or higher
