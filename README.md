@@ -66,6 +66,9 @@ The plugin logs all actions to WooCommerce logs with the following sources:
 
 ## Changelog
 
+### 1.2.0
+- Added `Reset End Date - Add 3 Minutes` AutomateWoo action. Mirror of `Reset Scheduled Action` but for the end date — nudges `end` forward so Action Scheduler recreates a missing `woocommerce_scheduled_subscription_expiration` action.
+
 ### 1.1.0
 - Renamed actions: `Reset Payment Date` → `Reset Scheduled Action`, `Add Payment Time` → `Remove End Date`.
 - `Remove End Date` now skips when the end date is already in the past, and uses HPOS-safe date handling.
