@@ -1,0 +1,85 @@
+name: Build release zip
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag/ref to build (and upload to, if it matches an existing release)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN_SLUG: automatewoo-subscription-utilities
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "7.4"
+          tools: composer:v2
+          coverage: none
+
+      - name: Install production dependencies
+        run: composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-progress
+
+      - name: Stage plugin files
+        run: |
+          set -euo pipefail
+          BUILD_DIR="${RUNNER_TEMP}/build/${PLUGIN_SLUG}"
+          mkdir -p "${BUILD_DIR}"
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.idea' \
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='.editorconfig' \
+            --exclude='.DS_Store' \
+            --exclude='tests' \
+            --exclude='node_modules' \
+            --exclude='composer.lock' \
+            --exclude='phpunit.xml*' \
+            --exclude='phpcs.xml*' \
+            ./ "${BUILD_DIR}/"
+          echo "BUILD_PARENT=${RUNNER_TEMP}/build" >> "$GITHUB_ENV"
+
+      - name: Determine version
+        id: version
+        run: |
+          REF="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION="${REF#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Create zip
+        run: |
+          set -euo pipefail
+          ZIP_NAME="${PLUGIN_SLUG}-${{ steps.version.outputs.version }}.zip"
+          cd "${BUILD_PARENT}"
+          zip -r "${GITHUB_WORKSPACE}/${ZIP_NAME}" "${PLUGIN_SLUG}"
+          echo "ZIP_PATH=${GITHUB_WORKSPACE}/${ZIP_NAME}" >> "$GITHUB_ENV"
+          echo "ZIP_NAME=${ZIP_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload zip as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP_NAME }}
+          path: ${{ env.ZIP_PATH }}
+          if-no-files-found: error
+
+      - name: Attach zip to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "${ZIP_PATH}" --clobber
