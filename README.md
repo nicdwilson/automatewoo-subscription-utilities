@@ -49,27 +49,6 @@ Once the plugin is activated, you'll find three new actions in your AutomateWoo 
    - Recommended usage: Run as a manual workflow
    - Recommended usage: target only active subscriptions (these are the only subscriptions expected to have scheduled payment actions)
 
-### Programmatic Usage
-
-You can also use the utility functions directly in your code:
-
-```php
-// Reset scheduled payment action (add 3 minutes)
-$subscription = wcs_get_subscription( 123 );
-\AutomateWooSubscriptionUtilities\Utilities\Subscription_Actions::reset_scheduled_action( $subscription );
-
-// Remove end date from subscription
-\AutomateWooSubscriptionUtilities\Utilities\Subscription_Actions::remove_end_date( $subscription );
-
-// Audit a subscription
-$audit_result = \AutomateWooSubscriptionUtilities\Utilities\Subscription_Audit::audit_subscription( $subscription );
-
-// Audit multiple subscriptions
-$subscription_ids = [ 123, 456, 789 ];
-$audit_results = \AutomateWooSubscriptionUtilities\Utilities\Subscription_Audit::audit_multiple_subscriptions( $subscription_ids );
-$summary = \AutomateWooSubscriptionUtilities\Utilities\Subscription_Audit::get_audit_summary( $audit_results );
-```
-
 ## Logging
 
 The plugin logs all actions to WooCommerce logs with the following sources:
@@ -81,14 +60,16 @@ The plugin logs all actions to WooCommerce logs with the following sources:
 
 ## Changelog
 
+### 1.1.0
+- Renamed actions: `Reset Payment Date` → `Reset Scheduled Action`, `Add Payment Time` → `Remove End Date`.
+- `Remove End Date` now skips when the end date is already in the past, and uses HPOS-safe date handling.
+- Overhauled audit system with comprehensive logging, admin UI/notices, and a daily audit trigger.
+- Audit "Edit Subscription" links now use the HPOS-aware order edit URL.
+- Removed unused utility classes; the action classes are the canonical entry points.
+- Added a GitHub Actions release workflow that publishes a production zip (with `vendor/`) on each release.
+
 ### 1.0.0
-- Initial release
-- Added Reset Scheduled Action action
-- Added Remove End Date action
-- Added Audit Subscription Scheduled Actions action
-- Added utility classes for programmatic usage
-- Added comprehensive logging
-- Updated to WordPress Coding Standards naming conventions
+- Initial release.
 
 ## Support
 

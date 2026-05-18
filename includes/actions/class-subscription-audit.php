@@ -38,8 +38,8 @@ class Subscription_Audit extends Action {
 			$next_payment_scheduled = as_next_scheduled_action( 'woocommerce_scheduled_subscription_payment', [ 'subscription_id' => $subscription_id ] );
 			$expiration_scheduled   = as_next_scheduled_action( 'woocommerce_scheduled_subscription_expiration', [ 'subscription_id' => $subscription_id ] );
 			
-			// Build admin edit links
-			$admin_url = admin_url( 'post.php?post=' . $subscription_id . '&action=edit' );
+			// Build admin edit link (HPOS-aware via WC_Order::get_edit_order_url())
+			$admin_url = $subscription->get_edit_order_url();
 			$edit_link = sprintf( '<a href="%s" target="_blank">Edit Subscription</a>', esc_url( $admin_url ) );
 			
 			if ( ! $next_payment_scheduled && ! $expiration_scheduled ) {

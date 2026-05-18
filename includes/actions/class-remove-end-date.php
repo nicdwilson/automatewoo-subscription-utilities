@@ -32,15 +32,13 @@ class Remove_End_Date extends Action {
 		}
 		
 		try {
-			// Get the current end date
+			// Get the current end date. get_time() returns a UTC unix timestamp (0 if unset);
+			// get_date() returns the human-readable site-tz string used in log output.
+			$end_timestamp    = $subscription->get_time( 'end' );
 			$current_end_date = $subscription->get_date( 'end' );
-			
-			if ( $current_end_date ) {
-				// Check if the end date is in the past
-				$end_timestamp = strtotime( $current_end_date );
-				$current_timestamp = current_time( 'timestamp' );
-				
-				if ( $end_timestamp < $current_timestamp ) {
+
+			if ( $end_timestamp ) {
+				if ( $end_timestamp < time() ) {
 					// End date is in the past, subscription has already ended
 					wc_get_logger()->info(
 						sprintf(

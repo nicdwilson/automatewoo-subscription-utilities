@@ -95,3 +95,9 @@ Thumbs.db
 # Build artifacts
 /build/
 /dist/
+
+# Working notes (not shipped)
+/planning.md
+
+# Claude Code local state
+/.claude/
