@@ -43,7 +43,13 @@ Once the plugin is activated, you'll find three new actions in your AutomateWoo 
    - Useful for extending subscriptions indefinitely
    - Recommended usage: run as a manual workflow
 
-3. **Audit Subscription Scheduled Actions**
+3. **Reset End Date - Add 3 Minutes**
+   - Adds 3 minutes to the existing end date
+   - Why? Nudging the end date recreates the stored expiration Scheduled Action in Action Scheduler — useful when the expiration scheduled action is missing and the subscription would otherwise stay active indefinitely
+   - Skipped if the subscription has no end date set
+   - Recommended usage: run as a manual workflow on subscriptions identified by the audit
+
+4. **Audit Subscription Scheduled Actions**
    - Checks if a subscription has scheduled payment and expiration actions
    - Logs results to WooCommerce logs with admin edit links
    - Recommended usage: Run as a manual workflow
