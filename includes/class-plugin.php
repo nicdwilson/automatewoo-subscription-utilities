@@ -81,6 +81,7 @@ class Plugin {
 		// Add our custom actions to the includes array
 		$includes['subscription_reset_scheduled_action'] = 'AutomateWooSubscriptionUtilities\Actions\Reset_Scheduled_Action';
 		$includes['subscription_remove_end_date'] = 'AutomateWooSubscriptionUtilities\Actions\Remove_End_Date';
+		$includes['subscription_reset_end_date'] = 'AutomateWooSubscriptionUtilities\Actions\Reset_End_Date';
 		$includes['subscription_audit'] = 'AutomateWooSubscriptionUtilities\Actions\Subscription_Audit';
 		
 		return $includes;

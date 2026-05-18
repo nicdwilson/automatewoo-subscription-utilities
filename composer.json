@@ -27,6 +27,7 @@
             "includes/class-plugin.php",
             "includes/actions/class-reset-scheduled-action.php",
             "includes/actions/class-remove-end-date.php",
+            "includes/actions/class-reset-end-date.php",
             "includes/actions/class-subscription-audit.php"
         ]
     },
