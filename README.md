@@ -55,6 +55,17 @@ Once the plugin is activated, you'll find three new actions in your AutomateWoo 
    - Recommended usage: Run as a manual workflow
    - Recommended usage: target only active subscriptions (these are the only subscriptions expected to have scheduled payment actions)
 
+### AutomateWoo Triggers
+
+1. **Daily Subscription Audit**
+   - Fires daily for active subscriptions whose next payment date falls within a configurable rolling window
+   - Two configurable fields:
+     - `Window (days)` (default 7) — how far ahead to look for upcoming renewals
+     - `Audit interval (days)` (default 1) — minimum days between audits of the same subscription
+   - Plus the standard `Time of day` field provided by AutomateWoo
+   - Side-effect-free: the trigger only emits the data layer; attach the **Audit Subscription Scheduled Actions** action (and any remediation actions you want) to the workflow
+   - Backed by AutomateWoo's `AbstractBatchedDailyTrigger`, so batches are scheduled via Action Scheduler
+
 ## Logging
 
 The plugin logs all actions to WooCommerce logs with the following sources:
@@ -65,6 +76,9 @@ The plugin logs all actions to WooCommerce logs with the following sources:
 - `automatewoo-subscription-utilities-audit-errors` - Audit errors
 
 ## Changelog
+
+### 1.3.0
+- Added `Daily Subscription Audit` AutomateWoo trigger. Backed by `AbstractBatchedDailyTrigger`, queries active subscriptions whose next payment falls within a configurable rolling window (default 7 days) and re-audits each at most once per configurable interval (default 1 day). HPOS-safe via `wcs_get_orders_with_meta_query`, cursor-paginated by subscription ID. Pair with the existing `Audit Subscription Scheduled Actions` action in workflows.
 
 ### 1.2.0
 - Added `Reset End Date - Add 3 Minutes` AutomateWoo action. Mirror of `Reset Scheduled Action` but for the end date — nudges `end` forward so Action Scheduler recreates a missing `woocommerce_scheduled_subscription_expiration` action.

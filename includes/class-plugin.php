@@ -51,6 +51,9 @@ class Plugin {
 		
 		// Register AutomateWoo actions via filter after AutomateWoo has initialized
 		add_action( 'automatewoo_init', array( $this, 'register_automatewoo_actions_hook' ) );
+
+		// Register AutomateWoo triggers via filter after AutomateWoo has initialized
+		add_action( 'automatewoo_init', array( $this, 'register_automatewoo_triggers_hook' ) );
 	}
 
 	/**
@@ -83,7 +86,26 @@ class Plugin {
 		$includes['subscription_remove_end_date'] = 'AutomateWooSubscriptionUtilities\Actions\Remove_End_Date';
 		$includes['subscription_reset_end_date'] = 'AutomateWooSubscriptionUtilities\Actions\Reset_End_Date';
 		$includes['subscription_audit'] = 'AutomateWooSubscriptionUtilities\Actions\Subscription_Audit';
-		
+
+		return $includes;
+	}
+
+	/**
+	 * Register AutomateWoo triggers hook
+	 */
+	public function register_automatewoo_triggers_hook() {
+		add_filter( 'automatewoo/triggers', array( $this, 'register_automatewoo_triggers' ) );
+	}
+
+	/**
+	 * Register AutomateWoo triggers
+	 *
+	 * @param array $includes Array of trigger includes
+	 * @return array Modified array with our triggers added
+	 */
+	public function register_automatewoo_triggers( $includes ) {
+		$includes['daily_subscription_audit'] = 'AutomateWooSubscriptionUtilities\Triggers\Daily_Subscription_Audit';
+
 		return $includes;
 	}
 
