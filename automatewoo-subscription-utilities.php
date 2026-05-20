@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AutomateWoo Subscription Utilities
  * Description: A collection of utilities for AutomateWoo and WooCommerce Subscriptions.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: @nicw, WooCommerce Growth Team
  * Text Domain: automatewoo-subscription-utilities
  * Domain Path: /languages
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants
-define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_VERSION', '1.2.0' );
+define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_VERSION', '1.3.0' );
 define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_FILE', __FILE__ );
 define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AUTOMATEWOO_SUBSCRIPTION_UTILITIES_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
